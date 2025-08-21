@@ -1,11 +1,11 @@
 #FPS
-FPS = 60
+FPS = 120
 #Screen Size
 width = 1280
 height = 720
 #Zoom
 default_zoom = 1.0
-min_zoom = 0.5
+min_zoom = 0.8
 max_zoom = 2.0
 zoom_scale_factor = 0.1
 # Colores

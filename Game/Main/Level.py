@@ -1,11 +1,9 @@
-import pygame
-import constantes
-import maps
-from Tiles_maps import Tile_Grass
-from Tiles_maps import Tiles_Grass1
+import pygame, constantes, maps, os
+from Tiles_maps import Tile_Grass, Tiles_Grass1
 from Player import Player
 
-
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_DIR = os.path.join(CURRENT_DIR, "Assets")
 
 
 class Level:
@@ -23,7 +21,9 @@ class Level:
                     y = row_index * 32
                     Tile_Grass((x,y), [self.sprites, self.obstacles])          
                 if col == 9:
-                    self.Player = Player((x,y),[self.sprites], self.obstacles)
+                    player_x = col_index * 32
+                    Player_y = row_index * 32 
+                    self.Player = Player((player_x, Player_y),[self.sprites], self.obstacles)
     
     def run(self):
         self.sprites.draw(self.Player)
@@ -38,7 +38,7 @@ class YGroupCamera(pygame.sprite.Group):
         self.offset = pygame.math.Vector2()
     
         #Ground
-        self.ground = pygame.image.load("Assets/water.png")
+        self.ground = pygame.image.load(os.path.join(ASSETS_DIR, "grass.png"))
         self.ground_rect = self.ground.get_rect(topleft=(0,0))
 
         #Zoom
@@ -54,9 +54,9 @@ class YGroupCamera(pygame.sprite.Group):
 
     def zoom_keybord(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_p]:
+        if keys[pygame.K_p]and self.zoom_scale <= constantes.max_zoom:
             self.zoom_scale += 0.1
-        if keys[pygame.K_o]:
+        if keys[pygame.K_o] and self.zoom_scale >= constantes.min_zoom:
             self.zoom_scale -= 0.1
 
     def draw(self, Player):

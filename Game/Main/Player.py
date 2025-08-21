@@ -1,16 +1,19 @@
-import pygame
-import maps 
+import pygame, os, maps
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_DIR = os.path.join(CURRENT_DIR, "Assets")
+PLAYER_DIR = os.path.join(ASSETS_DIR, "Player")
 
 #imports the character sprite and manages its vector and velocity
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, obstacles):
         super().__init__(groups)
 
-        self.image = pygame.image.load("Assets/Player/davidatras1.png")
+        self.image = pygame.image.load(os.path.join(PLAYER_DIR, "davidatras1.png")).convert_alpha()
         self.rect = self.image.get_rect(topleft = pos)
         
         self.direccion = pygame.math.Vector2()
-        self.velocidad = 1 
+        self.velocidad = 2
         
         self.Obstacles = obstacles
  #detects which key is being pressed to make the character move

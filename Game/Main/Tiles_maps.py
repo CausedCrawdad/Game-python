@@ -1,12 +1,14 @@
-import pygame
-import maps
+import pygame, maps, os
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+ASSETS_DIR = os.path.join(CURRENT_DIR, "Assets")
 
 
 class Tile_Grass(pygame.sprite.Sprite):
     def __init__(self, posicition, groups):
         super().__init__(groups)
 
-        self.image = pygame.image.load("Assets/grass.png")
+        self.image = pygame.image.load(os.path.join(ASSETS_DIR, "grass.png"))
         self.rect = self.image.get_rect(topleft=posicition)
 
 class Tiles_Grass1(pygame.sprite.Sprite):
