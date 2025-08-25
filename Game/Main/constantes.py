@@ -10,17 +10,27 @@ def import_folder(path):
             surface_list.append(image_surf)
     return surface_list
 
+#ESTADOS DE JUEGO
+state_of_game = {
+    "intro": 0,
+    "Game": 1,
+    "Pause": 2,
+    "Game_over": 3,
+    "Exit": 4,
+    "fight": 5,
+    "Config": 6,
+}
 
 
 #FPS
-FPS = 1200
+FPS = 60
 #Screen Size
 width = 1280
 height = 720
 #Zoom
 default_zoom = 1.0
-min_zoom = 0.8
-max_zoom = 2.0
+min_zoom = 0.9
+max_zoom = 1.4
 zoom_scale_factor = 0.1
 # Colores
 Blue = (0, 0, 255)
@@ -28,3 +38,5 @@ White = (255, 255, 255)
 Brown = (139, 69, 19)
 Green = (0, 128, 0)
 Black = (0, 0, 0)
+Grey = (0, 0, 0, 0.3)
+Gold = (255, 215, 0)

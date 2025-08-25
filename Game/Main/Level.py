@@ -36,9 +36,7 @@ class YGroupCamera(pygame.sprite.Group):
         self.half_width = self.screen.get_size()[0] // 2 
         self.half_height = self.screen.get_size()[1] // 2
         self.offset = pygame.math.Vector2()
-    
-        #Ground
-        self.ground = pygame.image.load(os.path.join(ASSETS_DIR, "grass.png"))
+        self.ground = pygame.image.load(os.path.join(ASSETS_DIR, "underground.png")).convert_alpha()
         self.ground_rect = self.ground.get_rect(topleft=(0,0))
 
         #Zoom
@@ -55,10 +53,9 @@ class YGroupCamera(pygame.sprite.Group):
     def zoom_keybord(self):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_p]and self.zoom_scale <= constantes.max_zoom:
-            self.zoom_scale += 0.1
+            self.zoom_scale += 0.1        
         if keys[pygame.K_o] and self.zoom_scale >= constantes.min_zoom:
             self.zoom_scale -= 0.1
-
     def draw(self, Player):
         
         self.zoom_keybord()
@@ -78,7 +75,5 @@ class YGroupCamera(pygame.sprite.Group):
         
         scale_surface = pygame.transform.scale(self.internal_surface,self.internal_surface_size_vector * self.zoom_scale)
         scale_rect = scale_surface.get_rect(center=(self.half_width,self.half_height))       
-        
-        
         
         self.screen.blit(scale_surface,scale_rect)
