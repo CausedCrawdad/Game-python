@@ -9,7 +9,10 @@ class Nombre:
     def __init__(self):
         pygame.init()
         pygame.joystick.init()
-        pygame.mixer.init()
+        try:
+            pygame.mixer.init()
+        except:
+            print("no se encontro un dispositivo de audio")
         self.screen = pygame.display.set_mode((constantes.width, constantes.height))
         pygame.display.set_caption("MONDONGO")
         self.clock = pygame.time.Clock()
