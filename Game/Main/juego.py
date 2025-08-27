@@ -5,6 +5,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(CURRENT_DIR, "Assets")
 MUSIC_DIR = os.path.join(ASSETS_DIR, "Music")
 
+#Clase principal gestiona el menu de Pausa y el menu para iniciar el juego 
 class Nombre:
     def __init__(self):
         pygame.init()
@@ -13,6 +14,7 @@ class Nombre:
             pygame.mixer.init()
         except:
             print("no se encontro un dispositivo de audio")
+        self.music_position = 0
         self.screen = pygame.display.set_mode((constantes.width, constantes.height))
         pygame.display.set_caption("MONDONGO")
         self.clock = pygame.time.Clock()
@@ -22,7 +24,8 @@ class Nombre:
         # Carga la imagen de fondo una sola vez al inicio
         self.intro_background = pygame.image.load(os.path.join(ASSETS_DIR, 'persona3.jpg'))
         self.level = None
-    
+        
+    #Intro del juego
     def intro_screen(self):
         title = self.font.render('Risk Of Rain 2', True, constantes.Black)
         title_rect = title.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height() / 4))
@@ -51,23 +54,20 @@ class Nombre:
             pygame.display.update()
             self.clock.tick(constantes.FPS)
     
+    #Menu de pausa
     def pause_menu(self):
+
+
         overlay = pygame.Surface((constantes.width, constantes.height), pygame.SRCALPHA)
         overlay.fill(constantes.Grey)
         self.screen.blit(overlay,(0,0))
         
-        resume_buttom = Button(self.screen.get_width() / 2 - 100, self.screen.get_height() / 2 - 80, 200, 50,constantes.White, constantes.Green, 'Resume', 32 )
-        menu_buttom = Button(self.screen.get_width() / 2 - 100, self.screen.get_height() / 2, 200, 50, constantes.White, constantes.Blue, "Menu Principal", 32 )
-        exit_buttom = Button(self.screen.get_width()/ 2 - 100, self.screen.get_height() / 2 + 80, 200, 50, constantes.White, constantes.Blue, "Exit", 32 )
+        resume_buttom = Button(self.screen.get_width() / 2 - 100, self.screen.get_height() / 2 - 80, 200, 50,constantes.White, constantes.Black, 'Resume', 28 )
+        menu_buttom = Button(self.screen.get_width() / 2 - 100, self.screen.get_height() / 2, 200, 50, constantes.White, constantes.Black, "Menu Principal", 28 )
+        exit_buttom = Button(self.screen.get_width()/ 2 - 100, self.screen.get_height() / 2 + 80, 200, 50, constantes.White,constantes.Black , "Exit", 28 )
     
-        title = self.font.render("Game Paused", True, constantes.Gold)
+        title = self.font.render("Game Paused", True, constantes.Orange)
         title_rect = title.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height() / 4))
-         
-        pygame.mixer.music.pause()        
-        try: 
-            music_pause = pygame.mixer.music.load(os.path.join(MUSIC_DIR, ""))
-        except:
-            print("no se encontro la musica")
         while self.estado_actual == constantes.state_of_game["Pause"]:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -75,18 +75,19 @@ class Nombre:
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         self.estado_actual = constantes.state_of_game["Game"]
-                        pygame.mixer.music.unpause()
+                        pygame.mixer.music.set_volume(1.0)
+                        return
                 elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if resume_buttom.is_pressed(event.pos):
                         self.estado_actual = constantes.state_of_game["Game"]
-                        pygame.mixer_music.unpause()
+                        pygame.mixer_music.set_volume(1.0)
+                        return
                     elif menu_buttom.is_pressed(event.pos):
                         self.estado_actual = constantes.state_of_game["intro"]
-                        if self.level:
-                            self.level = None
                     elif exit_buttom.is_pressed(event.pos):
                         self.estado_actual = constantes.state_of_game["Exit"] 
-       
+                        return
+            
             self.screen.blit(title, title_rect)
             self.screen.blit(resume_buttom.image, resume_buttom.rect)
             self.screen.blit(menu_buttom.image, menu_buttom.rect)
@@ -94,13 +95,13 @@ class Nombre:
 
             pygame.display.update()
             self.clock.tick(constantes.FPS)
-
+    
+    #Carga el Level()
     def run_game(self):
-        if  not self.level:
-            self.level = Level()
-            pygame.mixer.music.pause()
-            self.musica_de_juego = pygame.mixer.music.load(os.path.join(MUSIC_DIR, "No es undertale.mp3"))
-            pygame.mixer.music.play(loops=-1, fade_ms=6000)
+        self.level = Level()
+        pygame.mixer.music.pause()
+        self.musica_de_juego = pygame.mixer.music.load(os.path.join(MUSIC_DIR, "No es undertale.mp3"))
+        pygame.mixer.music.play(loops=-1, fade_ms=6000)
 
         while self.estado_actual == constantes.state_of_game["Game"]:
             for event in pygame.event.get():
@@ -108,7 +109,7 @@ class Nombre:
                     self.estado_actual = constantes.state_of_game["Exit"]
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        pygame.mixer.music.pause()
+                        pygame.mixer.music.set_volume(0.2)
                         self.estado_actual = constantes.state_of_game["Pause"]
                         self.pause_menu()
                         continue
@@ -118,6 +119,7 @@ class Nombre:
             pygame.display.update()
             self.dt = self.clock.tick(constantes.FPS) / 1000
 
+    #Maneja los estados de juego
     def run(self):
         while self.estado_actual != constantes.state_of_game["Exit"]:
             if self.estado_actual == constantes.state_of_game["intro"]:
@@ -130,6 +132,7 @@ class Nombre:
         pygame.quit()
         sys.exit()
 
+#Clase para los botones
 class Button:
     def __init__(self, x, y, width, height, fg, bg, content, fontsize):
         self.font = pygame.font.Font(None, fontsize)
