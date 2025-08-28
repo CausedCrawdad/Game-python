@@ -30,7 +30,7 @@ class Player(pygame.sprite.Sprite):
             self.status = 'up'
         elif keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.direccion.y = 1
-            self.status = 'down'
+            self.status = 'down_idle'
         else:
             self.direccion.y = 0
 

@@ -1,6 +1,7 @@
 import pygame, os
 from os import walk
-
+from random import uniform
+from pygame.math import Vector2 as vector
 def import_folder(path):
     surface_list = []
     for _, _, image_files in walk(path):
@@ -17,11 +18,12 @@ state_of_game = {
     "Pause": 2,
     "Game_over": 3,
     "Exit": 4,
-    "fight": 5,
+    "battle": 5,
     "Config": 6,
 }
 
 
+ANIMATION_SPEED = 6
 #FPS
 FPS = 60
 #Screen Size
@@ -41,6 +43,21 @@ Black = (0, 0, 0)
 Grey = (0, 0, 0, 0.3)
 Gold = (255, 215, 0)
 Orange = (254, 80, 0)
+
+def import_folder(path):
+    surface_list = []
+    for _, _, image_files in walk(path):
+        for image in image_files:
+            full_path = os.path.join(path, image)
+            image_surf = pygame.image.load(full_path).convert_alpha()
+            surface_list.append(image_surf)
+    return surface_list
+
+#posiciones de combate
+Battle_positions = {
+    'izq': {'center': (190, 400)},
+    'der': {'center': (1110, 390)}
+}
 
 
 

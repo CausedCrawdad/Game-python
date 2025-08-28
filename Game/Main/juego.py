@@ -1,19 +1,22 @@
 import pygame, os, constantes, sys
 from Level import Level
+from Battle import battle
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(CURRENT_DIR, "Assets")
 MUSIC_DIR = os.path.join(ASSETS_DIR, "Music")
 
-#Clase principal gestiona el menu de Pausa y el menu para iniciar el juego 
 class Nombre:
     def __init__(self):
         pygame.init()
         pygame.joystick.init()
+        self.mixer_initialized = False
         try:
             pygame.mixer.init()
-        except:
+            self.mixer_initialized = True
+        except pygame.error:
             print("no se encontro un dispositivo de audio")
+        
         self.music_position = 0
         self.screen = pygame.display.set_mode((constantes.width, constantes.height))
         pygame.display.set_caption("MONDONGO")
@@ -21,11 +24,10 @@ class Nombre:
         self.estado_actual = constantes.state_of_game["intro"]
         self.font = pygame.font.Font(None, 40)
         self.dt = 0
-        # Carga la imagen de fondo una sola vez al inicio
         self.intro_background = pygame.image.load(os.path.join(ASSETS_DIR, 'persona3.jpg'))
         self.level = None
+        self.battle_instance = None
         
-    #Intro del juego
     def intro_screen(self):
         title = self.font.render('Risk Of Rain 2', True, constantes.Black)
         title_rect = title.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height() / 4))
@@ -43,9 +45,7 @@ class Nombre:
                     if play_button.is_pressed(event.pos):
                         self.estado_actual = constantes.state_of_game["Game"]
 
-            # Redimensiona la imagen para que coincida con el tamaño de la pantalla
             scaled_background = pygame.transform.scale(self.intro_background, (constantes.width, constantes.height))
-            # Dibuja la imagen redimensionada en la pantalla
             self.screen.blit(scaled_background, (0, 0))
 
             self.screen.blit(title, title_rect)
@@ -54,10 +54,7 @@ class Nombre:
             pygame.display.update()
             self.clock.tick(constantes.FPS)
     
-    #Menu de pausa
     def pause_menu(self):
-
-
         overlay = pygame.Surface((constantes.width, constantes.height), pygame.SRCALPHA)
         overlay.fill(constantes.Grey)
         self.screen.blit(overlay,(0,0))
@@ -96,12 +93,21 @@ class Nombre:
             pygame.display.update()
             self.clock.tick(constantes.FPS)
     
-    #Carga el Level()
+    def run_battle(self):
+        if self.battle_instance:
+            self.battle_instance.run()
+
     def run_game(self):
-        self.level = Level()
-        pygame.mixer.music.pause()
-        self.musica_de_juego = pygame.mixer.music.load(os.path.join(MUSIC_DIR, "No es undertale.mp3"))
-        pygame.mixer.music.play(loops=-1, fade_ms=6000)
+        if self.level is None:
+            self.level = Level()
+        
+        if self.mixer_initialized:
+            try:
+                pygame.mixer.music.pause()
+                self.musica_de_juego = pygame.mixer.music.load(os.path.join(MUSIC_DIR, "No es undertale.mp3"))
+                pygame.mixer.music.play(loops=-1, fade_ms=6000)
+            except pygame.error:
+                print("Error al cargar o reproducir música.")
 
         while self.estado_actual == constantes.state_of_game["Game"]:
             for event in pygame.event.get():
@@ -109,17 +115,24 @@ class Nombre:
                     self.estado_actual = constantes.state_of_game["Exit"]
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
-                        pygame.mixer.music.set_volume(0.2)
+                        if self.mixer_initialized:
+                            pygame.mixer.music.set_volume(0.2)
                         self.estado_actual = constantes.state_of_game["Pause"]
                         self.pause_menu()
                         continue
+            
+            enemy_triggered = self.level.run()
+
+            if enemy_triggered:
+                self.estado_actual = constantes.state_of_game["battle"]
+                self.battle_instance = battle(self.level.Player, enemy_triggered)
+                continue
             
             self.screen.fill(constantes.Black)
             self.level.run()
             pygame.display.update()
             self.dt = self.clock.tick(constantes.FPS) / 1000
 
-    #Maneja los estados de juego
     def run(self):
         while self.estado_actual != constantes.state_of_game["Exit"]:
             if self.estado_actual == constantes.state_of_game["intro"]:
@@ -127,12 +140,13 @@ class Nombre:
             elif self.estado_actual == constantes.state_of_game["Game"]:
                 self.run_game()
             elif self.estado_actual == constantes.state_of_game["Pause"]:
-                self.pause_menu()        
+                self.pause_menu()
+            elif self.estado_actual == constantes.state_of_game["fight"]:
+                self.run_battle()        
     
         pygame.quit()
         sys.exit()
 
-#Clase para los botones
 class Button:
     def __init__(self, x, y, width, height, fg, bg, content, fontsize):
         self.font = pygame.font.Font(None, fontsize)

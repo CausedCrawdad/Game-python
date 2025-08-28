@@ -1,33 +1,57 @@
 import pygame, constantes, maps, os
 from Tiles_maps import Tile_Grass, Tiles_Grass1
 from Player import Player
+from enemy import Enemy
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(CURRENT_DIR, "Assets")
-
 
 class Level:
     def __init__(self):
         self.screen = pygame.display.get_surface()
         self.sprites = YGroupCamera()
         self.obstacles = pygame.sprite.Group()
+        self.Player = None
+        self.enemy_list = []
         self.createmap()
     
     def createmap(self):
+        # PRIMER RECORRIDO: Crea solo al jugador para que exista para otras entidades
         for row_index, row in enumerate(maps.map1):
             for col_index, col in enumerate(row):
-                if col == 1:
-                    x = col_index * 32
-                    y = row_index * 32
-                    Tile_Grass((x,y), [self.sprites, self.obstacles])          
                 if col == 9:
-                    player_x = col_index * 32
-                    Player_y = row_index * 32 
-                    self.Player = Player((player_x, Player_y),[self.sprites], self.obstacles)
-    
+                    x = col_index * 32
+                    y = row_index * 32 
+                    self.Player = Player((x, y), [self.sprites], self.obstacles)
+                    break
+            if self.Player:
+                break
+
+        # SEGUNDO RECORRIDO: Ahora crea todas las demás entidades
+        for row_index, row in enumerate(maps.map1):
+            for col_index, col in enumerate(row):
+                x = col_index * 32
+                y = row_index * 32
+                
+                if col == 1:
+                    Tile_Grass((x, y), [self.sprites, self.obstacles])
+                elif col == 8:
+                    new_enemy = Enemy((x, y), [self.sprites], "dragon", self.Player, self.obstacles)
+                    self.enemy_list.append(new_enemy)
+                    self.enemy = new_enemy
+
     def run(self):
-        self.sprites.draw(self.Player)
-        self.sprites.update()
+        if self.Player:
+            self.sprites.draw(self.Player)
+            self.sprites.update()
+        else:
+            print("Error: El jugador no se ha creado en el mapa. Revisa el mapa.")
+        
+        for enemy in self.enemy_list:
+            if enemy.is_in_battle:
+                return enemy
+        
+        return None
 
 class YGroupCamera(pygame.sprite.Group):
     def __init__(self):
@@ -39,7 +63,7 @@ class YGroupCamera(pygame.sprite.Group):
         self.ground = pygame.image.load(os.path.join(ASSETS_DIR, "underground.png")).convert_alpha()
         self.ground_rect = self.ground.get_rect(topleft=(0,0))
 
-        #Zoom
+
         self.zoom_scale = 1 
         self.internal_surface_size = (2500,2500)
         self.internal_surface = pygame.Surface(self.internal_surface_size, pygame.SRCALPHA)
@@ -62,7 +86,6 @@ class YGroupCamera(pygame.sprite.Group):
 
         self.internal_surface.fill(constantes.Black)
         
-        #Ground
         ground_offset = self.ground_rect.topleft - self.offset + self.internal_offset
         self.internal_surface.blit(self.ground,ground_offset)
 
