@@ -1,4 +1,4 @@
-import pygame, os, constantes, sys
+import pygame, os, constantes, sys, random
 from Level import Level
 from Battle import battle
 
@@ -10,6 +10,7 @@ class Nombre:
     def __init__(self):
         pygame.init()
         pygame.joystick.init()
+        self.random = random.randint(1,10000)
         self.mixer_initialized = False
         try:
             pygame.mixer.init()
@@ -25,6 +26,8 @@ class Nombre:
         self.font = pygame.font.Font(None, 40)
         self.dt = 0
         self.intro_background = pygame.image.load(os.path.join(ASSETS_DIR, 'persona3.jpg'))
+        if self.random == 7463:
+            self.intro_background = pygame.image.load(os.path.join(ASSETS_DIR, "solid.jpeg"))
         self.level = None
         self.battle_instance = None
         
@@ -37,6 +40,13 @@ class Nombre:
             pygame.mixer.music.play(loops=-1, fade_ms=7000)
         except:
             print("no se encontro la musica")
+        if self.random == 7463:
+            title = self.font.render('Solid', True, constantes.Black)
+            title_rect = title.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height() / 4))
+            pygame.mixer.music.pause()
+            self.musica_random = pygame.mixer.music.load(os.path.join(MUSIC_DIR,"solid.mp3"))
+            pygame.mixer.music.play(loops=-1, fade_ms=7000)
+
         while self.estado_actual == constantes.state_of_game["intro"]:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -47,7 +57,6 @@ class Nombre:
 
             scaled_background = pygame.transform.scale(self.intro_background, (constantes.width, constantes.height))
             self.screen.blit(scaled_background, (0, 0))
-
             self.screen.blit(title, title_rect)
             self.screen.blit(play_button.image, play_button.rect)
             
@@ -125,7 +134,7 @@ class Nombre:
 
             if enemy_triggered:
                 self.estado_actual = constantes.state_of_game["battle"]
-                self.battle_instance = battle(self.level.Player, enemy_triggered)
+                self.battle_instance = battle(self.level.Player, enemy_triggered,constantes.Green,constantes.Black,None)
                 continue
             
             self.screen.fill(constantes.Black)
@@ -141,7 +150,7 @@ class Nombre:
                 self.run_game()
             elif self.estado_actual == constantes.state_of_game["Pause"]:
                 self.pause_menu()
-            elif self.estado_actual == constantes.state_of_game["fight"]:
+            elif self.estado_actual == constantes.state_of_game["battle"]:
                 self.run_battle()        
     
         pygame.quit()
