@@ -38,20 +38,30 @@ class Level:
                 elif col == 8:
                     new_enemy = Enemy((x, y), [self.sprites], "dragon", self.Player, self.obstacles)
                     self.enemy_list.append(new_enemy)
+                    new_enemy.is_eliminated = False
                     self.enemy = new_enemy
 
     def run(self):
-        if self.Player:
+        enemy_triggered = None
+        self.enemy_list = [enemy for enemy in self.enemy_list if not getattr(enemy,"is_eliminated",False)]
+
+        for enemy in self.enemy_list:
+            if enemy.is_in_battle:
+                enemy_triggered = enemy
+                break
+        for enemy in self.enemy_list:
+            if enemy_triggered and enemy != enemy_triggered:
+                if enemy.is_in_battle:
+                    enemy.is_in_battle = False 
+                    enemy.set_battle_scale(False)
+
+        if not enemy_triggered and self.Player:
             self.sprites.draw(self.Player)
             self.sprites.update()
         else:
-            print("Error: El jugador no se ha creado en el mapa. Revisa el mapa.")
-        
-        for enemy in self.enemy_list:
-            if enemy.is_in_battle:
-                return enemy
-        
-        return None
+            self.sprites.draw(self.Player)
+
+        return enemy_triggered
 
 class YGroupCamera(pygame.sprite.Group):
     def __init__(self):
@@ -64,7 +74,7 @@ class YGroupCamera(pygame.sprite.Group):
         self.ground_rect = self.ground.get_rect(topleft=(0,0))
 
 
-        self.zoom_scale = 1 
+        self.zoom_scale = 1.3 
         self.internal_surface_size = (2500,2500)
         self.internal_surface = pygame.Surface(self.internal_surface_size, pygame.SRCALPHA)
         self.internal_rect = self.internal_surface.get_rect(center = (self.half_width, self.half_height))

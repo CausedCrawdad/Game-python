@@ -14,7 +14,8 @@ class Entity(pygame.sprite.Sprite):
         pass
 
     def animate(self):
-        # 1. Obtener la lista de animaciones para el estado actual
+        # 1. Obtener la lista de animaciones para el estado actua
+        
         animation = self.animations.get(self.status)
 
         # 2. Verificar si la animación existe y no está vacía

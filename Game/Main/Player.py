@@ -10,8 +10,10 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, obstacles):
         super().__init__(groups)
 
+        self.battle_sprite = pygame.image.load(os.path.join(ASSETS_DIR, "david_heart.png")).convert_alpha()
+        self.battle_sprite = pygame.transform.scale(self.battle_sprite, (64, 64))
         self.import_player_assets()
-        self.status = 'down'  
+        self.status = 'down' 
         self.image = self.animations[self.status][0]
         self.rect = self.image.get_rect(topleft = pos)
         
@@ -21,8 +23,16 @@ class Player(pygame.sprite.Sprite):
         self.frame_index = 0
         self.animation_speed = 0.15
         self.Obstacles = obstacles
+        self.in_battle = False
+        self.pre_battle_status = None
+        self.pre_battle_image = None
 
+               
     def Keybord(self):
+        
+        if hasattr(self, "in_battle") and self.in_battle:
+            return
+
         keys = pygame.key.get_pressed()
        
         if keys[pygame.K_UP] or keys[pygame.K_w]:
@@ -82,11 +92,28 @@ class Player(pygame.sprite.Sprite):
                         self.rect.top = sprite.rect.bottom
     
     def update(self):
-        self.Keybord()
-        self.move(self.velocidad)
-        self.get_status()
+        if not hasattr(self, 'in_battle') or not self.in_battle:
+            self.Keybord()
+            self.move(self.velocidad)
+            self.get_status()
         self.animate()
     
+    def set_battle_state(self, in_battle):
+        self.in_battle = in_battle
+        if in_battle:
+            self.pre_battle_status = self.status
+            self.pre_battle_image = self.image.copy()
+            self.image = self.battle_sprite
+            old_center = self.rect.center
+            self.rect = self.image.get_rect(center=old_center)
+        else:
+            if self.pre_battle_status:
+                self.status = self.pre_battle_status
+            if self.pre_battle_image:
+                self.image = self.pre_battle_image
+                old_center = self.rect.center
+                self.rect = self.image.get_rect(center=old_center)
+            self.frame_index = 0
     def import_player_assets(self):
         character_path = os.path.join(ASSETS_DIR, 'Player')
         self.animations = {'up': [],'down': [],'left': [],'right': [],'right_idle': [],'left_idle': [],'up_idle': [],'down_idle': []}
@@ -98,6 +125,9 @@ class Player(pygame.sprite.Sprite):
                 self.animations[animation] = import_folder(full_path)
 
     def animate(self):
+        
+        if self.in_battle:
+            return
         
         animation = self.animations[self.status]
         

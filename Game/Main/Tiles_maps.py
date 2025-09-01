@@ -15,6 +15,6 @@ class Tiles_Grass1(pygame.sprite.Sprite):
     def __init__(self, posicition, groups):
         super().__init__(groups)
         
-        self.image = pygame.image.load("Assets/grass1.png").convert_alpha(s)
+        self.image = pygame.image.load("Assets/grass1.png").convert_alpha()
         self.scale = pygame.transform.scale(self.image, (32, 32))
         self.rect = self.image.get_rect(topleft=posicition)
