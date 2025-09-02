@@ -43,6 +43,9 @@ class Level:
                 elif col == 6:
                     Tile_Grass1((x,y), [self.sprites])
 
+                x = col_index * 10
+                y = row_index * 24
+                
                 if col == 7:
                     new_boss = boss((x,y), [self.sprites], "Final_boss",self.Player, self.obstacles)
                     self.enemy_list.append(new_boss)

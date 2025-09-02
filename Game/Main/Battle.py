@@ -48,6 +48,7 @@ class battle:
         self.player_sprites = pygame.sprite.Group()
         self.enemy_sprites = pygame.sprite.Group()
         self.fonts = fonts
+        self.is_boss_battle = hasattr(enemy, "is_boss") and enemy.is_boss
         self.setup()
         self.running = True
         player.set_battle_state(True)
