@@ -61,12 +61,17 @@ class battle:
         self.enemy_choice = None
         self.battle_result = None
         self.result_timer = 0
-        self.result_duration = 2000
-        self.player_lives = 3 
-        self.enemy_lives = 3
+        self.result_duration = 1000
+        if self.is_boss_battle:
+            self.player_lives = 3
+            self.enemy_lives = 5
+        else:
+            self.player_lives = 3
+            self.enemy_lives = 2
+        
         self.life_icon = self.battle_data["player"].battle_sprite
         self.life_icon = pygame.transform.scale(self.life_icon, (48,48))
-        
+        self.is_boss_battle = hasattr(enemy, 'is_boss') and enemy.is_boss
         self.defeat_animation = []
         self.defeat_animation_path = os.path.join(ASSETS_DIR, "Game Over")
         self.load_defeat_animation()
@@ -287,9 +292,6 @@ class battle:
         enemy_lives_icon.fill(White, special_flags=pygame.BLEND_RGB_MAX)
         papel_pos = None
         piedra_pos = None
-        
-        enemy_name = self.fonts["default"].render("Dragon", True, White)
-        self.display_surface.blit(enemy_name,(width - 320 + 120,220 ))
 
         for option in self.battle_options:
             if option.text == "Papel":

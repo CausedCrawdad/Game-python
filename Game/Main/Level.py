@@ -1,7 +1,7 @@
 import pygame, constantes, maps, os
-from Tiles_maps import Tile_Grass, Tiles_Grass1
+from Tiles_maps import Tile_Grass, Tile_Grass1, Tile_Grass2 
 from Player import Player
-from enemy import Enemy
+from enemy import Enemy, boss
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 ASSETS_DIR = os.path.join(CURRENT_DIR, "Assets")
@@ -34,12 +34,19 @@ class Level:
                 y = row_index * 32
                 
                 if col == 1:
-                    Tile_Grass((x, y), [self.sprites, self.obstacles])
+                    Tile_Grass2((x, y), [self.sprites, self.obstacles])
                 elif col == 8:
                     new_enemy = Enemy((x, y), [self.sprites], "dragon", self.Player, self.obstacles)
                     self.enemy_list.append(new_enemy)
                     new_enemy.is_eliminated = False
                     self.enemy = new_enemy
+                elif col == 6:
+                    Tile_Grass1((x,y), [self.sprites])
+
+                if col == 7:
+                    new_boss = boss((x,y), [self.sprites], "Final_boss",self.Player, self.obstacles)
+                    self.enemy_list.append(new_boss)
+                    new_boss.is_eliminated = False
 
     def run(self):
         enemy_triggered = None

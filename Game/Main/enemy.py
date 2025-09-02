@@ -121,3 +121,33 @@ class Enemy(Entity):
         else:
             if not self._battle_scaled:
                 self.set_battle_scale(True)
+
+class boss(Enemy):
+    def __init__(self, pos, groups, name, player_sprite, obstacles):
+        super().__init__(pos, groups, name, player_sprite, obstacles)
+        self.is_boss = True
+        self.battle_scale_factor = 4.0
+        self.vision_range = 150
+
+        self.import_boss_assets()
+        self.select_random_sprite()
+
+        if self.status in self.animations and self.animations[self.status] and self.seleted_sprite_index >= 0:
+            self.map_sprite = self.animations[self.status][self.seleted_sprite_index]
+            original_size = self.map_sprite.get_size()
+            new_size = (int(original_size[0] * self.battle_scale_factor), int(original_size[1] * self.battle_scale_factor))
+            self.image = pygame.transform.scale(self.map_sprite, new_size)
+        else:
+            self.image = pygame.Surface((32,32))
+            self.image.fill('purple')
+        
+        self.rect = self.image.get_rect(topleft=pos)
+        self.original_image = self.image.copy()
+        self.original_size = self.rect.copy()
+    
+    def import_boss_assets(self):
+        full_path = os.path.join(ENEMY_DIR, "boss")
+        self.animations = {'idle': []}
+
+        if os.path.exists(full_path):
+            self.animations["idle"] = import_folder(full_path)

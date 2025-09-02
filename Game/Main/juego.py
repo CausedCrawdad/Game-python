@@ -131,8 +131,12 @@ class Nombre:
                 pygame.mixer.music.pause()
 
                 try:
-                    battle_music = pygame.mixer.Sound(os.path.join(MUSIC_DIR, "The Hammer.mp3"))
-                    battle_music.set_volume(0.2)
+                    is_boss_battle = hasattr(self.battle_instance.battle_data['enemy'], 'is_boss') and self.battle_instance.battle_data['enemy'].is_boss
+                    if is_boss_battle:
+                        battle_music = pygame.mixer.Sound(os.path.join(MUSIC_DIR,"perfect.mp3"))
+                    else:
+                        battle_music = pygame.mixer.Sound(os.path.join(MUSIC_DIR, "The Hammer.mp3"))
+                    battle_music.set_volume(0.5)
                     chanel = battle_music.play(loops=-1, fade_ms=6000)
                 except:
                     print("No se encontro la musica")
@@ -153,6 +157,11 @@ class Nombre:
 
         enemy_path = os.path.join(ASSETS_DIR, "Enemies", "map_sprite")
         self.enemy_frames = import_folder(enemy_path)
+        
+        boss_path = os.path.join(ASSETS_DIR, "Enemies", "boss")
+        if os.path.exists(boss_path):
+            self.boss_frame = import_folder(boss_path)
+
 
         self.bs_surf = pygame.image.load(os.path.join(ASSETS_DIR, "background_bt.png")).convert_alpha()
 
@@ -212,7 +221,13 @@ class Nombre:
                 battle_result = self.run_battle()        
                 if battle_result == "Derrota":
                     self.estado_actual = constantes.state_of_game["Exit"]
-    
+                elif battle_result == "Victoria" or "Escape":
+                    self.estado_actual = constantes.state_of_game["Game"]
+                    if self.mixer_initialized:
+                        try:
+                            pygame.mixer.music.unpause()
+                        except:
+                            pass
         pygame.quit()
         sys.exit()
 
