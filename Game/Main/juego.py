@@ -40,7 +40,7 @@ class Nombre:
         self.fonts = None
 
     def intro_screen(self):
-        title = self.font.render('David Story', True, constantes.Black)
+        title = self.font.render('', True, constantes.Black)
         title_rect = title.get_rect(center=(self.screen.get_width() / 2, self.screen.get_height() / 4))
         play_button = Button(self.screen.get_width() / 2 - 50, self.screen.get_height() / 2, 100, 50, constantes.White, constantes.Black, 'play', 32)
         try:
